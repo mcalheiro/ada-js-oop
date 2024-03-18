@@ -202,6 +202,7 @@ console.log('\n-----------------------------------------------------------------
 class ContaPoupanca extends Conta {
     #taxaJuros
     #limiteSaques
+    #PORCENTAGEM_MAXIMA_SAQUE = 0.25
     static melhoresInvestimentos = ["Tesouro Direto", "Ações"]
     static INSTRUCOES_CONTA_POUPANCA = '\n- Calcular os juros \n- Gerenciar seu limite de saques \n- Verificar indicações de investimentos'
 
@@ -212,7 +213,7 @@ class ContaPoupanca extends Conta {
     }
 
     get taxaJuros() {
-        return this.#taxaJuros
+        return this.#taxaJuros * 100 + '%'
     }
 
     get limiteSaques() {
@@ -226,8 +227,13 @@ class ContaPoupanca extends Conta {
     }
 
     gerenciarLimiteSaques(novoLimite) {
+        const saldoAtual = Conta.formatarValor(this.saldo)
+        const limiteSaque = this.#PORCENTAGEM_MAXIMA_SAQUE * saldoAtual
+        if (novoLimite > limiteSaque) {
+            throw new Error(`Limite de saque ultrapassado. Limite máximo: ${Conta.formatarValor(limiteSaque, true)}`)
+        }
         this.#limiteSaques = novoLimite
-        return `Alteração do limite para saques solicitada. Novo limite:  ${this.#limiteSaques}`
+        return `Alteração do limite para saques solicitada. Novo limite:  ${this.limiteSaques}`
     }
 
     static verificarMelhorInvestimento() {
